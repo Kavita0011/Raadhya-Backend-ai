@@ -11,16 +11,6 @@ services:
       - key: SESSION_SECRET_KEY
         value: ANOTHER_VERY_LONG_SECRET_KEY
       - key: POSTGRES_PASSWORD
-        fromDatabase:
-          name: roject_root_db
-          property: password
+        value: XKDhi5Bgh9nr9A7MjUOJqowz16gGzOfv
       - key: DATABASE_URL
-        fromDatabase:
-          name: roject_root_db
-          property: connectionString
-
-databases:
-  - name: roject_root_db
-    plan: free
-    databaseName: roject_root_db
-    user: roject_root_db_user
+        value: postgresql://roject_root_db_user:XKDhi5Bgh9nr9A7MjUOJqowz16gGzOfv@dpg-d1brk23e5dus73et561g-a.oregon-postgres.render.com/roject_root_db
