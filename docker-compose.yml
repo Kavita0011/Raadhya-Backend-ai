@@ -1,0 +1,83 @@
+#version: '3.9'
+
+services:
+  # FastAPI Application Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production # Use the production stage from Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      # Load environment variables from .env file (for local development)
+      # In production, use secrets management systems (Kubernetes Secrets, Vault, etc.)
+      - APP_SECRET_KEY=${APP_SECRET_KEY}
+      - SESSION_SECRET_KEY=${SESSION_SECRET_KEY}
+      - SESSION_COOKIE_NAME=${SESSION_COOKIE_NAME}
+      - SESSION_COOKIE_DOMAIN=${SESSION_COOKIE_DOMAIN}
+      - SESSION_COOKIE_SAMESITE=${SESSION_COOKIE_SAMESITE}
+      - SESSION_COOKIE_SECURE=${SESSION_COOKIE_SECURE}
+      - SESSION_COOKIE_HTTPONLY=${SESSION_COOKIE_HTTPONLY}
+      - SESSION_IDLE_TIMEOUT=${SESSION_IDLE_TIMEOUT}
+      - SESSION_ABSOLUTE_TIMEOUT=${SESSION_ABSOLUTE_TIMEOUT}
+      - CORS_ORIGINS=${CORS_ORIGINS}
+      - CORS_METHODS=${CORS_METHODS}
+      - CORS_HEADERS=${CORS_HEADERS}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_DB=${REDIS_DB}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    volumes:
+      - .:/app # Mount current directory for live code changes (optional for production)
+    depends_on:
+      db:
+        condition: service_healthy # Ensure DB is ready before app starts
+      redis:
+        condition: service_healthy # Ensure Redis is ready before app starts
+    healthcheck: # Redundant if HEALTHCHECK in Dockerfile is good, but good for compose's depends_on
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 30s
+      start_period: 5s
+      retries: 3
+
+  # PostgreSQL Database Service
+  db:
+    image: postgres:16-alpine # Use a lightweight PostgreSQL image
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data # Persistent volume for database data
+    ports:
+      - "5432:5432" # Expose for local access if needed
+    healthcheck: # Ensure PostgreSQL is ready
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Redis Service (for Sessions)
+  redis:
+    image: redis:7-alpine # Use a lightweight Redis image
+    restart: always
+    command: redis-server --appendonly yes # Enable AOF persistence for Redis
+    volumes:
+      - redis_data:/data # Persistent volume for Redis data
+    ports:
+      - "6379:6379" # Expose for local access if needed
+    healthcheck: # Ensure Redis is ready
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  postgres_data:
+  redis_data:

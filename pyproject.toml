@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "fastapi-flawless-backend"
+version = "0.1.0"
+description = "A production-grade, near-flawless backend built with FastAPI, PostgreSQL, and Redis for sessions."
+authors = ["Raadhya Tantra AI <ai@example.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11" # Targeting Python 3.11 for performance and async features
+fastapi = "^0.111.0"
+uvicorn = {extras = ["standard"], version = "^0.30.1"}
+SQLAlchemy = {extras = ["asyncio"], version = "^2.0.30"}
+asyncpg = "^0.29.0" # PostgreSQL async driver
+redis = {extras = ["hiredis"], version = "^5.0.0"} # Async Redis client
+passlib = {extras = ["bcrypt"], version = "^1.7.4"} # For password hashing
+python-jose = {extras = ["cryptography"], version = "^3.3.0"} # For JWT (even if session-based, good to have for future)
+pydantic = {extras = ["email"], version = "^2.7.4"} # For data validation
+pydantic-settings = "^2.2.1" # For environment variable management
+python-multipart = "^0.0.9" # For file uploads (even if optional, it's a common need)
+uuid = "^1.30" # For UUID generation
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.2"
+pytest-asyncio = "^0.23.6"
+httpx = "^0.27.0" # For testing FastAPI apps
+alembic = "^1.13.1" # For database migrations
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
