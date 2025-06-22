@@ -14,3 +14,4 @@ services:
         value: XKDhi5Bgh9nr9A7MjUOJqowz16gGzOfv
       - key: DATABASE_URL
         value: postgresql://roject_root_db_user:XKDhi5Bgh9nr9A7MjUOJqowz16gGzOfv@dpg-d1brk23e5dus73et561g-a.oregon-postgres.render.com/roject_root_db
+buildCommand: pip install -r requirements.txt
